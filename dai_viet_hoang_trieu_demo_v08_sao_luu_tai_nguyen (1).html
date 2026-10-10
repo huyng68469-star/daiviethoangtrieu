@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Đại Việt Hoàng Triều: Bản Đồ Quyền Lực — Prototype 0.6 Âm thanh</title>
+<style>
+:root{--paper:#e8dbbf;--paper2:#f3ead7;--ink:#1e140f;--red:#8a0b0b;--gold:#b38b47;--muted:#705e4a;--line:#c5ad83;--shadow:0 12px 34px #1e140f20}
+*{box-sizing:border-box}body{margin:0;background:#251b15;color:var(--ink);font-family:Georgia,"Times New Roman",serif;min-height:100vh;letter-spacing:normal;word-spacing:normal;font-kerning:normal} 
+/* Fix: prevent accidental expanded spacing in Vietnamese text and controls */
+body,body *{word-break:normal;overflow-wrap:break-word}
+button,input,select,textarea{font-family:Georgia,"Times New Roman",serif;letter-spacing:normal;word-spacing:normal;text-align:left}
+button{white-space:normal;line-height:1.35}
+input,select,textarea{line-height:1.4}
+p,label,.notice,.evidence,.choice,.npc-dialogue{letter-spacing:normal;word-spacing:normal;text-align:left}
+
+button,input,select{font:inherit}button{cursor:pointer;border:1px solid var(--gold);background:var(--red);color:#fff7e9;padding:11px 16px;border-radius:4px;transition:.15s}button:hover{filter:brightness(1.12);transform:translateY(-1px)}button.secondary{background:transparent;color:var(--ink)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.screen{display:none;min-height:100vh}.screen.active{display:flex}.center{align-items:center;justify-content:center;padding:24px}
+.parchment{background:var(--paper);border:1px solid var(--gold);box-shadow:var(--shadow);position:relative}
+.parchment:before{content:"";position:absolute;inset:7px;border:1px solid #b38b4745;pointer-events:none}
+.title-card{max-width:850px;width:100%;padding:clamp(30px,6vw,70px);text-align:center;background:linear-gradient(135deg,#f0e4cc,#dfcba7)}
+.kicker{letter-spacing:.22em;text-transform:uppercase;color:var(--red);font-size:.82rem}.game-title{font-size:clamp(2.2rem,6vw,4.7rem);line-height:1.02;margin:18px 0 8px;font-weight:normal}.subtitle{letter-spacing:.28em;font-size:clamp(.9rem,2vw,1.25rem);color:var(--red)}.tagline{font-style:italic;margin:24px 0 36px;color:var(--muted)}.button-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.panel{max-width:880px;width:100%;padding:clamp(24px,5vw,48px);background:var(--paper2)}.panel h2{font-size:clamp(1.6rem,4vw,2.3rem);font-weight:normal;margin:8px 0 18px}.quote{font-size:1.15rem;line-height:1.7;border-left:3px solid var(--red);padding-left:18px;margin:20px 0}.story{line-height:1.85;font-size:1.04rem;white-space:pre-line}.small{font-size:.86rem;color:var(--muted)}label{display:block;margin:14px 0 6px;font-size:.94rem}input,select{width:100%;padding:11px;border:1px solid var(--line);background:#fffaf0;color:var(--ink);border-radius:3px} .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px}
+#game{display:block;padding:0;min-height:100vh;background:var(--paper)}.hud{background:var(--ink);color:var(--paper);padding:10px 18px;display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-bottom:3px solid var(--gold)}.brand-mini{letter-spacing:.1em;color:#e5c989;font-size:.9rem}.stats{display:flex;gap:14px;flex-wrap:wrap;font-size:.9rem}.stats span{white-space:nowrap}.layout{max-width:1440px;margin:auto;padding:18px;display:grid;grid-template-columns:210px minmax(0,1fr) 265px;gap:16px}.card{border:1px solid var(--line);background:#f4ead7;padding:16px;box-shadow:0 3px 12px #1e140f0b}.card h3{margin:0 0 12px;color:var(--red);font-size:1.05rem;font-weight:normal;letter-spacing:.04em}.nav-btn{display:block;width:100%;margin:7px 0;background:transparent;color:var(--ink);text-align:left;border-color:transparent}.nav-btn.active,.nav-btn:hover{background:#dfcba7;border-color:var(--gold);transform:none}.scene{min-height:380px;background:linear-gradient(#d9c6a2cc,#e8dbbfef),radial-gradient(ellipse at top,#fff4d7,#b69a6c);border:1px solid var(--gold);padding:clamp(20px,3vw,34px);position:relative}.scene:after{content:"";position:absolute;inset:9px;border:1px solid #b38b4740;pointer-events:none}.scene>*{position:relative;z-index:1}.scene h2{font-size:clamp(1.6rem,3vw,2.35rem);font-weight:normal;margin:8px 0 14px}.scene p{line-height:1.75}.eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.17em;color:var(--red)}.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}.choice{background:#f7efdf;color:var(--ink);border:1px solid var(--line);text-align:left;min-height:72px}.choice strong{display:block;color:var(--red);font-size:1rem;margin-bottom:5px}.choice span{font-size:.87rem;line-height:1.4}.choice:hover{background:#ead8b8}.choice:disabled{opacity:.55}.evidence{border-left:3px solid var(--gold);padding:8px 10px;margin:9px 0;background:#e8dbbf80;font-size:.9rem;line-height:1.5}.tag{display:inline-block;padding:3px 7px;border:1px solid var(--gold);font-size:.75rem;color:var(--red);margin:2px 3px 2px 0}.meter{height:5px;background:#d6c4a4;margin:5px 0 10px}.meter i{display:block;height:100%;background:var(--red)}.log{max-height:260px;overflow:auto;font-size:.87rem;line-height:1.5}.log-entry{padding:8px 0;border-bottom:1px solid #c5ad8370}.foot-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.foot-actions button{font-size:.86rem;padding:8px 11px}.notice{padding:10px 12px;border:1px solid var(--gold);background:#ead8b8;margin:12px 0;line-height:1.5}.hidden{display:none!important}.footer-note{text-align:center;font-size:.8rem;color:var(--muted);margin:15px}
+.npc-stage{display:grid;grid-template-columns:minmax(140px,220px) minmax(0,1fr);gap:18px;align-items:center;margin:0 0 22px;padding:14px;background:#f2e5cb;border:1px solid #b38b4770;position:relative;z-index:2;box-shadow:0 4px 12px #1e140f12}
+.npc-art{height:230px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 80%,#b38b4728,transparent 65%),#ead9b8;border:1px solid #c5ad83}
+.npc-art:after{content:"";position:absolute;inset:7px;border:1px solid #8a0b0b30;pointer-events:none}
+.npc-art img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 5px 3px #1e140f1c);animation:npcFloat 4s ease-in-out infinite;z-index:1}
+.npc-art .asset-missing{display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;text-align:center;padding:15px;color:#705e4a;line-height:1.5}
+.asset-seal{display:grid;place-items:center;width:76px;height:76px;border:2px solid #8a0b0b8c;border-radius:50%;color:#8a0b0b;font-size:1.5rem;transform:rotate(-8deg)}
+.npc-name{font-size:1.35rem;color:var(--red);margin:0 0 4px;font-weight:normal}.npc-role{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}.npc-dialogue{line-height:1.7;margin:0}.npc-caption{font-size:.78rem;color:var(--muted);margin-top:8px}
+@keyframes npcFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@media(max-width:650px){.npc-stage{grid-template-columns:112px minmax(0,1fr);gap:12px;padding:9px}.npc-art{height:170px}.npc-name{font-size:1.1rem}}
+@media(prefers-reduced-motion:reduce){.npc-art img{animation:none}}
+
+
+.character-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.character-card{background:#f4ead7;border:1px solid var(--line);padding:14px;min-width:0}
+.character-card h3{margin:0 0 5px;color:var(--red);font-weight:normal}
+.character-preview{height:190px;display:flex;align-items:center;justify-content:center;background:#ead9b8;border:1px solid #c5ad83;margin:10px 0;overflow:hidden}
+.character-preview img{height:100%;max-width:100%;object-fit:contain;animation:npcFloat 4s ease-in-out infinite}
+.character-preview .asset-missing{padding:12px;text-align:center;line-height:1.5}
+.art-slot{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.art-slot label{font-size:.82rem;margin:0;display:flex;flex-direction:column;gap:5px}
+.art-slot input{padding:6px;font-size:.75rem;max-width:100%}
+.art-state{font-size:.78rem;color:var(--muted);margin-top:7px;line-height:1.45}
+@media(max-width:650px){.character-gallery{grid-template-columns:1fr}.character-preview{height:210px}.art-slot{grid-template-columns:1fr}}
+@media(max-width:980px){.layout{grid-template-columns:190px minmax(0,1fr)}.rightbar{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px}.rightbar .card{margin:0}}
+@media(max-width:650px){.layout{grid-template-columns:1fr;padding:10px}.leftbar{display:grid;grid-template-columns:1fr 1fr;gap:6px}.leftbar h3{grid-column:1/-1}.nav-btn{margin:2px 0}.rightbar{grid-template-columns:1fr}.choices{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.hud{padding:10px}.scene{min-height:320px}.title-card{padding:34px 20px}}
+
+.music-dock{position:fixed;right:14px;bottom:14px;z-index:9999;width:min(330px,calc(100vw - 28px));background:#f3ead7;border:1px solid #b38b47;box-shadow:0 8px 28px #0003;padding:12px;color:#1e140f}
+.music-dock summary{cursor:pointer;color:#8a0b0b;font-weight:bold;letter-spacing:.03em}
+.music-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.music-controls button{padding:8px 10px;font-size:.86rem}
+.music-controls label{font-size:.8rem;margin:4px 0;grid-column:1/-1}
+.music-controls input[type=file]{font-size:.75rem;padding:6px}
+.music-controls input[type=range]{padding:0}
+.music-status{font-size:.78rem;line-height:1.4;color:#705e4a;margin-top:8px;overflow-wrap:anywhere}
+@media(max-width:650px){.music-dock{right:8px;bottom:8px}}
+</style>
+</head>
+<body>
+<details class="music-dock" id="musicDock">
+ <summary>♫ Nhạc nền & âm thanh</summary>
+ <div class="music-controls">
+  <label>Chọn tệp nhạc từ máy tính (MP3, WAV, OGG, M4A)
+   <input id="musicFile" type="file" accept="audio/*">
+  </label>
+  <button type="button" onclick="playMusic()">▶ Phát nhạc</button>
+  <button type="button" class="secondary" onclick="pauseMusic()">Ⅱ Tạm dừng</button>
+  <label>Âm lượng <span id="volumeLabel">35%</span>
+   <input id="musicVolume" type="range" min="0" max="1" step="0.05" value="0.35" oninput="setMusicVolume(this.value)">
+  </label>
+  <button type="button" class="secondary" onclick="removeMusic()" style="grid-column:1/-1">Gỡ nhạc đã chọn</button>
+ </div>
+ <div class="music-status" id="musicStatus">Chưa có nhạc. Chọn một tệp âm thanh để thêm nhạc nền.</div>
+ <audio id="bgMusic" loop preload="metadata"></audio>
+</details>
+<section id="titleScreen" class="screen active center">
+ <div class="parchment title-card">
+  <div class="kicker">Đại Nam · Năm Tự Đức thứ chín · 1856</div>
+  <h1 class="game-title">ĐẠI VIỆT<br>HOÀNG TRIỀU</h1>
+  <div class="subtitle">BẢN ĐỒ QUYỀN LỰC</div>
+  <p class="tagline">Một đời người giữa vòng xoáy triều chính.</p>
+  <div class="button-row">
+   <button onclick="showScreen('introScreen')">Bước vào</button>
+   <button class="secondary" onclick="continueGame()">Tiếp tục</button>
+   <button class="secondary" onclick="loadGame()">Tải trò chơi</button>
+  </div>
+  <p class="small" style="margin-top:28px">BẢN CHƠI THỬ 0.3 · THƯ VIỆN TRANH NHÂN VẬT · CHƯƠNG I</p>
+ </div>
+</section>
+<section id="introScreen" class="screen center">
+ <div class="parchment panel">
+  <div class="kicker">Lời dẫn nhập</div>
+  <h2>Con đường của một kẻ sĩ</h2>
+  <div class="quote">“Đã mang tiếng ở trong trời đất,<br>Phải có danh gì với núi sông.”<div class="small" style="margin-top:8px">— Nguyễn Công Trứ, bài thơ thường được biết đến với câu mở đầu “Đi thi tự vịnh” (cần đối chiếu văn bản trước khi phát hành chính thức).</div></div>
+  <div class="story">Năm Tự Đức thứ chín, 1856.
+
+Kinh thành Huế nằm dưới bóng những mái ngói hoàng cung. Trong phủ đệ, cửa hiệu và những con đường ven sông, vận mệnh của một con người đôi khi được định đoạt bởi một tờ giấy, một lời giới thiệu, hay một điều chưa từng được nói ra.
+
+Ngươi đến đây với học vấn trong tay, nhưng không có gia thế nâng đỡ, không có người quyền quý bảo trợ, cũng chẳng có con đường nào được định sẵn.
+
+Muốn có chỗ đứng, ngươi phải tự tìm lấy. Muốn hiểu lòng người, ngươi phải biết nhìn qua những lời họ nói. Và khi đứng trước quyền lực, ngươi sẽ phải lựa chọn điều gì đáng giữ, điều gì đáng đánh đổi.
+
+Cuộc đời ngươi, bắt đầu từ đây.</div>
+  <div class="button-row" style="margin-top:28px"><button onclick="showScreen('creationScreen')">Tạo nhân vật</button><button class="secondary" onclick="showScreen('titleScreen')">Quay lại</button></div>
+ </div>
+</section>
+<section id="creationScreen" class="screen center">
+ <div class="parchment panel">
+  <div class="kicker">Hồ sơ nhân vật</div><h2>Ngươi là ai?</h2>
+  <p class="small">Bản chơi thử sử dụng một tiểu sử mặc định để đưa bạn vào gameplay nhanh. Các lựa chọn sẽ ảnh hưởng phần mô tả và một số điểm khởi đầu.</p>
+  <div class="form-grid">
+   <div><label for="playerName">Tên nhân vật</label><input id="playerName" maxlength="28" value="Người khách lạ" /></div>
+   <div><label for="origin">Quê quán</label><select id="origin"><option value="hue">Vùng kinh kỳ Huế</option><option value="north">Miền Bắc</option><option value="central">Miền Trung</option><option value="south">Vùng Gia Định phương Nam</option></select></div>
+   <div><label for="background">Gia cảnh</label><select id="background"><option value="scholar">Gia đình nhà nho sa sút</option><option value="merchant">Gia đình buôn bán nhỏ</option><option value="farmer">Gia đình nông dân có người từng đi học</option><option value="clerk">Gia đình có người làm việc giấy tờ</option></select></div>
+   <div><label for="motive">Động cơ chính</label><select id="motive"><option value="family">Báo đáp gia đình</option><option value="merit">Chứng minh năng lực</option><option value="knowledge">Theo đuổi học vấn</option><option value="autonomy">Giữ quyền tự chủ</option></select></div>
+  </div>
+  <div class="notice">Mặc định: 25 tuổi, có bằng Tú tài, cha từng dạy học và chép giấy tờ; mẹ và em gái còn ở quê. Bạc ban đầu: 24 đơn vị gameplay.</div>
+  <div class="button-row"><button onclick="startGame()">Bắt đầu cuộc đời</button><button class="secondary" onclick="showScreen('introScreen')">Quay lại lời dẫn</button></div>
+ </div>
+</section>
+<section id="game" class="screen">
+ <header class="hud">
+  <div class="brand-mini">ĐẠI VIỆT HOÀNG TRIỀU</div>
+  <div class="stats"><span>Ngày <b id="hudDay">1</b></span><span id="hudTime">Buổi sáng</span><span>📍 <b id="hudPlace">Phố buôn</b></span></div>
+  <div class="stats"><span>💰 <b id="hudMoney">24</b></span><span>✦ Danh tiếng <b id="hudRep">3</b></span><span>◈ Ảnh hưởng <b id="hudInfluence">1</b></span></div>
+ </header>
+ <div class="layout">
+  <aside class="leftbar card">
+   <h3>Hành trình</h3>
+   <button class="nav-btn active" data-view="scene" onclick="setView('scene',this)">◈ Hiện tại</button>
+   <button class="nav-btn" data-view="map" onclick="setView('map',this)">⌖ Bản đồ</button>
+   <button class="nav-btn" data-view="case" onclick="setView('case',this)">▤ Hồ sơ vụ việc</button>
+   <button class="nav-btn" data-view="journal" onclick="setView('journal',this)">☷ Nhật ký</button>
+   <button class="nav-btn" data-view="profile" onclick="setView('profile',this)">♙ Nhân vật</button>
+   <button class="nav-btn" data-view="characters" onclick="setView('characters',this)">▧ Tranh nhân vật</button>
+   <div class="foot-actions"><button class="secondary" onclick="saveGame()">Lưu</button><button class="secondary" onclick="loadGame()">Tải</button></div>
+   <div class="small" style="margin-top:12px">Mỗi hành động chính thường tiêu tốn một buổi. Hãy đọc chi phí trước khi chọn.</div>
+  </aside>
+  <main id="mainView" class="scene">
+   <div class="eyebrow">Chương I · Người khách lạ ở kinh thành</div>
+   <h2>Huế, buổi sớm</h2>
+   <p>Tiếng người gọi nhau ngoài phố hòa với tiếng guốc trên nền đường còn ẩm. Trong tay ngươi chỉ có ít bạc, vài bộ áo quần và tấm bằng Tú tài đã theo mình qua một quãng đường dài.</p>
+   <p>Ngươi cần tìm chỗ nghỉ và một công việc đủ nuôi thân. Không ai ở đây biết ngươi là ai — ít nhất là lúc này.</p>
+   <div class="choices">
+    <button class="choice" onclick="act('lodging')"><strong>Tìm chỗ nghỉ</strong><span>Ổn định nơi ở trước khi tìm việc.</span></button>
+    <button class="choice" onclick="act('work')"><strong>Hỏi việc ở phố buôn</strong><span>Chủ động tìm cơ hội kiếm sống.</span></button>
+    <button class="choice" onclick="act('study')"><strong>Ôn lại sách vở</strong><span>Dành thời gian cho học vấn.</span></button>
+    <button class="choice" onclick="act('wander')"><strong>Quan sát phố thị</strong><span>Tìm hiểu đường đi và nhịp sống.</span></button>
+   </div>
+  </main>
+  <aside class="rightbar">
+   <div class="card"><h3>Mục tiêu hiện tại</h3><div id="objective">Tìm chỗ nghỉ hoặc hỏi việc để bắt đầu cuộc sống tại kinh thành.</div><div style="margin-top:10px"><span class="tag">Chương I</span><span class="tag">Tự do lựa chọn</span></div></div>
+   <div class="card"><h3>Thuộc tính</h3><div>Học vấn <b id="statStudy">5</b>/10<div class="meter"><i id="barStudy" style="width:50%"></i></div></div><div>Mưu lược <b id="statWit">5</b>/10<div class="meter"><i id="barWit" style="width:50%"></i></div></div><div>Giao thiệp <b id="statSocial">4</b>/10<div class="meter"><i id="barSocial" style="width:40%"></i></div></div></div>
+   <div class="card"><h3>Diễn biến gần đây</h3><div id="recentLog" class="log"><div class="log-entry">Ngươi vừa đặt chân đến kinh thành.</div></div></div>
+  </aside>
+ </div>
+ <div class="footer-note">Bản chơi thử cục bộ · Lưu game trên trình duyệt này · Bối cảnh và nhân vật phụ là hư cấu</div>
+</section>
+<script>
+const $=id=>document.getElementById(id);
+let S=null, currentView='scene';
+const defaults=()=>({characterArt:{},name:'Người khách lạ',origin:'hue',background:'scholar',motive:'family',day:1,block:0,place:'Phố buôn',money:24,rep:3,influence:1,stats:{study:5,wit:5,social:4},lodging:false,askedWork:false,metLam:false,questStarted:false,clues:[],hypotheses:[],journal:[],questStage:0,lamTrust:0,accused:false,shared:false,ending:null,visited:{},originText:'',motiveText:''});
+
+const ART_CACHE={};
+const ART_DB_NAME='dvh_character_art_v1';
+let MUSIC_URL=null;
+const MUSIC_DB_KEY='background_music';
+function openArtDB(){return new Promise((resolve,reject)=>{if(!('indexedDB' in window)){reject(new Error('Trình duyệt không hỗ trợ kho ảnh IndexedDB'));return;}const req=indexedDB.open(ART_DB_NAME,2);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains('art'))db.createObjectStore('art',{keyPath:'id'});if(!db.objectStoreNames.contains('audio'))db.createObjectStore('audio',{keyPath:'id'});};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||new Error('Không mở được kho ảnh'));});}
+async function saveArtToDB(id,data){const db=await openArtDB();return new Promise((resolve,reject)=>{const tx=db.transaction('art','readwrite');tx.objectStore('art').put({id,data});tx.oncomplete=()=>{db.close();resolve(true)};tx.onerror=()=>{db.close();reject(tx.error||new Error('Không lưu được ảnh'))};});}
+async function deleteArtFromDB(prefix){const db=await openArtDB();return new Promise((resolve,reject)=>{const tx=db.transaction('art','readwrite'),store=tx.objectStore('art'),req=store.getAll();req.onsuccess=()=>{for(const item of req.result){if(item.id.startsWith(prefix))store.delete(item.id)}};tx.oncomplete=()=>{db.close();resolve(true)};tx.onerror=()=>{db.close();reject(tx.error||new Error('Không xóa được ảnh'))};});}
+async function loadArtFromDB(){try{const db=await openArtDB();const items=await new Promise((resolve,reject)=>{const tx=db.transaction('art','readonly'),req=tx.objectStore('art').getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);});db.close();for(const item of items){ART_CACHE[item.id]=item.data;}if(S){S.characterArt={};for(const [id,data] of Object.entries(ART_CACHE)){const [key,...rest]=id.split(':');if(!S.characterArt[key])S.characterArt[key]={};S.characterArt[key][rest.join(':')]=data;}if(currentView==='characters')renderCharacters();}}catch(e){console.warn('Không tải được thư viện tranh:',e);}}
+
+function musicStatus(text){const el=$('musicStatus');if(el)el.textContent=text;}
+function setMusicVolume(value){const audio=$('bgMusic');if(!audio)return;audio.volume=Number(value);$('volumeLabel').textContent=Math.round(Number(value)*100)+'%';}
+async function storeMusic(file){
+ if(!file)return;
+ if(!file.type.startsWith('audio/')){alert('Tệp này không được nhận dạng là âm thanh. Hãy chọn MP3, WAV, OGG hoặc M4A.');$('musicFile').value='';return;}
+ if(file.size>40*1024*1024){alert('Tệp nhạc lớn hơn 40 MB. Hãy chọn bản MP3 nhẹ hơn để lưu ổn định.');$('musicFile').value='';return;}
+ try{
+  const db=await openArtDB();await new Promise((resolve,reject)=>{const tx=db.transaction('audio','readwrite');tx.objectStore('audio').put({id:MUSIC_DB_KEY,name:file.name,blob:file});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('Không lưu được tệp nhạc'));});db.close();
+  useMusicBlob(file,file.name);musicStatus('Đã lưu nhạc: '+file.name+'. Bấm “Phát nhạc” để nghe.');
+ }catch(e){console.error(e);musicStatus('Không lưu được nhạc: '+(e.message||'lỗi trình duyệt'));alert('Không lưu được tệp nhạc. Hãy thử tệp nhỏ hơn hoặc dùng Chrome/Edge mới.');}
+}
+function useMusicBlob(blob,name){const audio=$('bgMusic');if(MUSIC_URL)URL.revokeObjectURL(MUSIC_URL);MUSIC_URL=URL.createObjectURL(blob);audio.src=MUSIC_URL;audio.loop=true;setMusicVolume($('musicVolume').value);musicStatus('Đã chọn: '+name+'. Trình duyệt cần bạn bấm “Phát nhạc” để bắt đầu.');}
+async function loadSavedMusic(){try{const db=await openArtDB();if(!db.objectStoreNames.contains('audio')){db.close();return;}const item=await new Promise((resolve,reject)=>{const tx=db.transaction('audio','readonly');const req=tx.objectStore('audio').get(MUSIC_DB_KEY);req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error);});db.close();if(item&&item.blob){useMusicBlob(item.blob,item.name||'Nhạc nền đã lưu');musicStatus('Đã khôi phục nhạc nền: '+(item.name||'tệp nhạc đã lưu')+'. Bấm “Phát nhạc” để nghe.');}}catch(e){console.warn('Không tải được nhạc nền:',e);}}
+async function playMusic(){const audio=$('bgMusic');if(!audio.src){$('musicDock').open=true;$('musicFile').click();return;}try{await audio.play();musicStatus('Đang phát nhạc nền. Nhạc sẽ lặp lại khi hết bản nhạc.');}catch(e){musicStatus('Trình duyệt chưa cho phát nhạc. Hãy chọn tệp nhạc và bấm “Phát nhạc” lần nữa.');}}
+function pauseMusic(){const audio=$('bgMusic');audio.pause();musicStatus('Đã tạm dừng nhạc nền.');}
+async function removeMusic(){pauseMusic();$('bgMusic').removeAttribute('src');$('bgMusic').load();if(MUSIC_URL){URL.revokeObjectURL(MUSIC_URL);MUSIC_URL=null;}try{const db=await openArtDB();await new Promise((resolve,reject)=>{const tx=db.transaction('audio','readwrite');tx.objectStore('audio').delete(MUSIC_DB_KEY);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});db.close();musicStatus('Đã gỡ nhạc nền đã lưu.');}catch(e){musicStatus('Đã gỡ nhạc khỏi trình phát nhưng không xóa được bản lưu.');}}
+function attachArtCacheToState(){if(!S) return;S.characterArt={};for(const [id,data] of Object.entries(ART_CACHE)){const [key,...rest]=id.split(':');if(!S.characterArt[key])S.characterArt[key]={};S.characterArt[key][rest.join(':')]=data;}}
+function saveStateWithoutImages(){if(!S)return;const clean={...S,characterArt:{}};localStorage.setItem('dvh_save',JSON.stringify(clean));}
+function showScreen(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active')}
+function continueGame(){let raw=localStorage.getItem('dvh_save');if(raw){try{S=JSON.parse(raw);attachArtCacheToState();showScreen('game');renderScene('welcomeBack');updateUI();log('Đã tiếp tục bản lưu gần nhất.');}catch(e){alert('Bản lưu không đọc được. Hãy bắt đầu trò chơi mới.')}}else{alert('Chưa có bản lưu trên trình duyệt này. Chọn “Bước vào” để bắt đầu.');}}
+function startGame(){
+ // Thư viện tranh được lưu riêng trong IndexedDB nên không bị xóa khi tạo lượt chơi mới.
+ S=defaults();attachArtCacheToState();S.name=$('playerName').value.trim()||'Người khách lạ';S.origin=$('origin').value;S.background=$('background').value;S.motive=$('motive').value;
+ const origins={hue:'vùng kinh kỳ Huế',north:'miền Bắc',central:'miền Trung',south:'vùng Gia Định phương Nam'};
+ const motives={family:'báo đáp gia đình',merit:'chứng minh năng lực',knowledge:'theo đuổi học vấn',autonomy:'giữ quyền tự chủ'};
+ S.originText=origins[S.origin];S.motiveText=motives[S.motive];
+ if(S.background==='merchant'){S.stats.wit=6;S.money=26}
+ if(S.background==='farmer'){S.stats.social=5;S.money=22}
+ if(S.background==='clerk'){S.stats.study=6;S.money=23}
+ S.journal.push({day:1,text:`${S.name} đến kinh thành Huế. Xuất thân: ${S.originText}; động cơ: ${S.motiveText}.`});
+ showScreen('game');renderScene('welcome');updateUI();renderLog();
+}
+function timeName(){return ['Buổi sáng','Buổi chiều','Buổi tối'][S.block%3]}
+function advance(cost=1){for(let i=0;i<cost;i++){S.block++;if(S.block>=3){S.block=0;S.day++;if(!S.lodging&&S.money>0){S.money=Math.max(0,S.money-1);log('Ngươi phải xoay xở thêm một ngày chưa có chỗ nghỉ ổn định.');}}}updateUI()}
+function log(text){if(!S)return;S.journal.unshift({day:S.day,text});renderLog()}
+function renderLog(){if(!$('recentLog')||!S)return;$('recentLog').innerHTML=S.journal.slice(0,7).map(x=>`<div class="log-entry"><span class="small">Ngày ${x.day}</span><br>${esc(x.text)}</div>`).join('')}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function updateUI(){if(!S)return;$('hudDay').textContent=S.day;$('hudTime').textContent=timeName();$('hudPlace').textContent=S.place;$('hudMoney').textContent=S.money;$('hudRep').textContent=S.rep;$('hudInfluence').textContent=S.influence;$('statStudy').textContent=S.stats.study;$('statWit').textContent=S.stats.wit;$('statSocial').textContent=S.stats.social;$('barStudy').style.width=S.stats.study*10+'%';$('barWit').style.width=S.stats.wit*10+'%';$('barSocial').style.width=S.stats.social*10+'%';}
+function setView(view,btn){currentView=view;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b===btn));if(view==='scene')renderScene('current');if(view==='map')renderMap();if(view==='case')renderCase();if(view==='journal')renderJournal();if(view==='profile')renderProfile();if(view==='characters')renderCharacters()}
+function npcStage(){
+ if(!S || currentView!=='scene' || (!S.askedWork && !S.metLam && S.questStage===0)) return '';
+ if(S.questStage>=3 && S.place!=='Cửa hàng của Lẫm') return '';
+ const mood=S.questStage===1?'talk':S.questStage===2?'listen':'idle';
+ const lines={idle:'“Cậu đến hỏi việc phải không? Ta đang thiếu người phụ tay.”',talk:'“Ta cần biết hai bó kia nằm ở khâu mô, chớ chưa thể nói ai làm sai.”',listen:'Lẫm im lặng nghe ngươi trình bày, đôi mắt vẫn đặt trên những tờ sổ.'};
+ return `<section class="npc-stage" aria-label="Nhân vật đang hiện diện">
+ <div><div class="npc-art"><img src="${(S.characterArt&&S.characterArt.doLam&&(S.characterArt.doLam[mood]||S.characterArt.doLam.portrait))||`assets/npc/do-van-lam-${mood}.png`}" alt="Đỗ Văn Lẫm, nhân vật minh họa phong cách tranh dân gian Đông Hồ" onerror="this.remove();this.parentElement.innerHTML='<div class=&quot;asset-missing&quot;><div class=&quot;asset-seal&quot;>林</div><b>Chưa có tranh Đỗ Văn Lẫm</b><span>Mở mục Tranh nhân vật để tải ảnh vào game</span></div>'"></div><div class="npc-caption">Tranh NPC · Có thể thay ảnh trực tiếp trong mục Tranh nhân vật</div></div>
+ <div><h3 class="npc-name">Đỗ Văn Lẫm</h3><div class="npc-role">Chủ hiệu buôn · Nhân vật hư cấu</div><p class="npc-dialogue">${lines[mood]}</p></div></section>`;
+}
+function setMain(html){$('mainView').innerHTML=npcStage()+html}
+function choices(arr){return '<div class="choices">'+arr.map(a=>`<button class="choice" ${a.disabled?'disabled':''} onclick="${a.action}"><strong>${a.title}</strong><span>${a.desc}</span></button>`).join('')+'</div>'}
+function renderScene(which){currentView='scene';let intro='';if(which==='welcomeBack')intro='<div class="notice">Bản lưu đã được khôi phục. Những lựa chọn trước đây vẫn được giữ lại.</div>';
+ if(!S.lodging&&!S.askedWork&&!S.metLam){setMain(`<div class="eyebrow">Chương I · Người khách lạ ở kinh thành</div><h2>${which==='welcomeBack'?'Trở lại kinh thành':'Huế, buổi sớm'}</h2>${intro}<p>Tiếng người gọi nhau ngoài phố hòa với tiếng guốc trên nền đường còn ẩm. Trong tay ngươi chỉ có ít bạc, vài bộ áo quần và tấm bằng Tú tài đã theo mình qua một quãng đường dài.</p><p>Ngươi cần tìm chỗ nghỉ và một công việc đủ nuôi thân. Không ai ở đây biết ngươi là ai — ít nhất là lúc này.</p>${choices([{title:'Tìm chỗ nghỉ',desc:'Ổn định nơi ở. Chi phí dự kiến 1 bạc.',action:"act('lodging')"},{title:'Hỏi việc ở phố buôn',desc:'Chủ động tìm cơ hội kiếm sống.',action:"act('work')"},{title:'Ôn lại sách vở',desc:'Dành một buổi cho học vấn.',action:"act('study')"},{title:'Quan sát phố thị',desc:'Tìm hiểu đường đi và nhịp sống.',action:"act('wander')"}])}`);$('objective').textContent='Tìm chỗ nghỉ hoặc hỏi việc để bắt đầu cuộc sống tại kinh thành.';return}
+ if(S.questStage===0){setMain(`<div class="eyebrow">Chương I · Cơ hội đầu tiên</div><h2>Ở phố buôn</h2><p>Ngươi đã bắt đầu tìm hiểu khu phố. Một người làm sổ sách tên Đỗ Văn Lẫm đang cần người phụ tay, nhưng ông ta chưa biết có thể tin ngươi đến đâu.</p><p>Lẫm ngẩng lên khỏi quyển sổ: “Cậu đến hỏi việc phải không? Ta đang thiếu người phụ tay, nhưng việc ghi chép không thể làm qua loa. Cậu đã từng coi sổ hàng bao giờ chưa?”</p>${choices([{title:'Thành thật xin thử việc',desc:'Nói rõ mình biết chép giấy tờ nhưng chưa thạo việc buôn bán.',action:"act('polite')"},{title:'Đề nghị xem sổ trước',desc:'Cho thấy sự cẩn trọng và khả năng quan sát.',action:"act('inspect')"},{title:'Hỏi rõ tiền công',desc:'Làm rõ điều kiện trước khi nhận việc.',action:"act('wage')"}])}`);$('objective').textContent='Tạo được cơ hội nhận việc thử từ Đỗ Văn Lẫm.';return}
+ if(S.questStage===1){setMain(`<div class="eyebrow">Nhiệm vụ chính · Mảnh giấy trong đêm mưa</div><h2>Hai con số không khớp</h2><p>Lẫm đặt trước mặt ngươi hai tờ giấy. Sổ hàng ghi xuất <b>12 bó vải thô</b>; biên nhận chỉ ghi <b>10 bó</b>.</p><div class="evidence"><b>Chứng cứ A — Sổ hàng:</b> ghi 12 bó vải thô. Chưa xác minh người lập và thời điểm ghi.</div><div class="evidence"><b>Chứng cứ B — Biên nhận:</b> ghi 10 bó. Chưa rõ người nhận có trực tiếp kiểm đếm hay không.</div><p>Lẫm nói: “Cậu xem cho kỹ. Ta cần biết hai bó kia nằm ở khâu mô, chớ chưa thể nói ai làm sai.”</p>${choices([{title:'Đối chiếu hai tờ giấy',desc:'Kiểm tra ngày tháng và nội dung. Tốn một buổi.',action:"act('compare')"},{title:'Hỏi Lẫm về quy trình',desc:'Tìm hiểu ai lập sổ và ai nhận hàng.',action:"act('askLam')"},{title:'Tìm người vận chuyển',desc:'Cần một đầu mối để hỏi lời khai trực tiếp.',action:"act('carrier')"},{title:'Kết luận ngay',desc:'Nhanh nhưng thiếu căn cứ và có thể gây mất lòng tin.',action:"act('accuse')"}])}`);$('objective').textContent='Xác minh nguồn gốc chênh lệch giữa 12 bó và 10 bó; chưa được kết luận có gian lận.';return}
+ if(S.questStage===2){setMain(`<div class="eyebrow">Nhiệm vụ chính · Đánh giá chứng cứ</div><h2>Điều gì đã được xác nhận?</h2><p>Ngươi đã có một phần thông tin. Nhưng lời khai, giấy tờ và suy luận không phải cùng một thứ. Chọn cách xử lý phù hợp với mức độ chắc chắn hiện tại.</p><div class="evidence"><b>Đã thu thập:</b> ${S.clues.map(esc).join(' · ')||'Chưa có chứng cứ bổ sung'}.</div>${choices([{title:'Điều tra tiếp',desc:'Tìm thêm đầu mối trước khi kết luận.',action:"act('continueInvestigation')"},{title:'Trao đổi riêng với Lẫm',desc:'Báo cáo điều đã biết và điều còn chưa rõ.',action:"act('shareLam')"},{title:'Khép lại ở mức chưa đủ chứng cứ',desc:'Không suy diễn vượt quá thông tin hiện có.',action:"act('closeCarefully')"},{title:'Công khai nghi vấn',desc:'Tạo áp lực, nhưng chịu rủi ro về danh tiếng.',action:"act('publicize')"}])}`);$('objective').textContent='Quyết định cách xử lý vụ việc dựa trên chứng cứ hiện có.';return}
+ if(S.questStage>=3){setMain(`<div class="eyebrow">Chương I · Cánh cửa đầu tiên</div><h2>Một chỗ đứng mong manh</h2><p>Vụ việc trước mắt đã được xử lý đến mức ngươi lựa chọn. Chưa có gì bảo đảm rằng con đường phía trước sẽ dễ dàng hơn. Nhưng giờ đây, ít nhất một người ở kinh thành đã biết ngươi có thể làm được việc gì — hoặc đã thấy cách ngươi hành động khi đứng trước điều chưa rõ.</p><div class="notice"><b>Kết quả hiện tại:</b> ${esc(S.ending||'Vụ việc tạm khép lại')}.</div>${choices([{title:'Nhận việc ghi chép tiếp theo',desc:'Kiếm thêm 3 bạc và dành một buổi làm việc.',action:"act('nextJob')"},{title:'Dành buổi tối học tập',desc:'Tăng Học vấn nếu còn thời gian và điều kiện.',action:"act('study')"},{title:'Thăm hỏi người quen',desc:'Bắt đầu xây dựng mạng lưới xã hội.',action:"act('network')"},{title:'Xem lại hồ sơ và nhật ký',desc:'Tổng kết điều đã biết và quyết định.',action:"setView('case',document.querySelector('[data-view=case]'))"}])}`);$('objective').textContent='Xây dựng nền tảng nghề nghiệp và chọn hướng đi tiếp theo.';return}
+}
+function act(a){
+ if(!S)return;
+ if(a==='lodging'){if(S.money<1){alert('Ngươi không đủ bạc cho lựa chọn này. Có thể hỏi việc trước.');return}S.money-=1;S.lodging=true;S.place='Chỗ trọ bình dân';advance();log('Thuê được chỗ nghỉ bình dân với giá 1 bạc.');renderScene();return}
+ if(a==='work'){S.askedWork=true;S.place='Phố buôn';advance();log('Ngươi bắt đầu hỏi việc tại phố buôn.');renderScene();return}
+ if(a==='study'){advance();S.stats.study=Math.min(10,S.stats.study+1);log('Dành thời gian ôn tập, Học vấn tăng 1.');renderScene();return}
+ if(a==='wander'){advance();S.visited.market=true;log('Ngươi quan sát đường đi và nhịp sống quanh khu phố buôn.');renderScene();return}
+ if(a==='polite'||a==='inspect'||a==='wage'){S.metLam=true;S.place='Cửa hàng của Lẫm';advance();if(a==='polite'){S.lamTrust+=2;log('Lẫm đồng ý giao cho ngươi xem một việc nhỏ sau khi nghe ngươi trình bày thành thật.')}else if(a==='inspect'){S.stats.wit=Math.min(10,S.stats.wit+1);S.lamTrust+=1;log('Ngươi xin xem sổ trước khi nhận việc; Lẫm đánh giá cao sự cẩn trọng.')}else{S.lamTrust-=1;log('Ngươi hỏi rõ tiền công. Lẫm trả lời rằng tiền công sẽ tùy việc, rồi mới đặt sổ hàng trước mặt.')}S.questStarted=true;S.questStage=1;renderScene();return}
+ if(a==='compare'){advance();S.clues.push('Hai chứng từ có số lượng khác nhau');S.clues.push('Cần xác minh ngày lập và người ghi');S.questStage=2;S.rep+=1;log('Ngươi xác nhận sự chênh lệch và ghi rõ những điểm chưa thể kết luận.');renderScene();return}
+ if(a==='askLam'){advance();S.clues.push('Lẫm chưa xác nhận ai trực tiếp kiểm đếm');S.questStage=2;log('Lẫm giải thích quy trình ở mức ông biết; một số khâu vẫn cần xác minh độc lập.');renderScene();return}
+ if(a==='carrier'){advance();S.clues.push('Người vận chuyển nói mình chở hàng nhưng không tự đếm tại điểm nhận');S.questStage=2;log('Ngươi tìm được lời khai của người vận chuyển. Lời khai xác nhận hành trình, không xác nhận đủ số lượng tại điểm nhận.');renderScene();return}
+ if(a==='accuse'){advance();S.accused=true;S.rep=Math.max(0,S.rep-2);S.lamTrust-=3;S.clues.push('Người chơi đã cáo buộc trước khi có đủ chứng cứ');S.questStage=2;log('Ngươi cáo buộc quá sớm. Lẫm phản ứng lạnh nhạt; lời cáo buộc được ghi nhận nhưng chưa được xác minh.');renderScene();return}
+ if(a==='continueInvestigation'){advance();if(!S.clues.includes('Người vận chuyển nói mình chở hàng nhưng không tự đếm tại điểm nhận'))S.clues.push('Người vận chuyển nói mình chở hàng nhưng không tự đếm tại điểm nhận');S.rep+=1;log('Ngươi dành thêm thời gian tìm nguồn xác minh. Vụ việc vẫn chưa đủ căn cứ để quy trách nhiệm.');S.questStage=3;S.ending='Đã xác nhận sai lệch, nhưng chưa đủ chứng cứ để xác định nguyên nhân.';renderScene();return}
+ if(a==='shareLam'){advance();S.shared=true;S.lamTrust+=1;S.rep+=1;log('Ngươi trao đổi riêng với Lẫm, phân biệt rõ điều đã biết và điều còn nghi vấn.');S.questStage=3;S.ending='Báo cáo riêng, giữ lại những điểm chưa được xác minh.';renderScene();return}
+ if(a==='closeCarefully'){advance();S.rep+=1;S.lamTrust+=1;log('Ngươi không kết luận vượt quá chứng cứ. Lẫm ghi nhận sự thận trọng của ngươi.');S.questStage=3;S.ending='Vụ việc tạm khép lại với kết luận chưa đủ chứng cứ.';renderScene();return}
+ if(a==='publicize'){advance();S.accused=true;S.rep=Math.max(0,S.rep-2);log('Nghi vấn được công khai. Một số người chú ý, nhưng chưa có chứng cứ đủ sức xác nhận cáo buộc.');S.questStage=3;S.ending='Nghi vấn đã công khai; danh tiếng chịu rủi ro vì chứng cứ còn thiếu.';renderScene();return}
+ if(a==='nextJob'){if(S.money>=0){S.money+=3;advance();S.rep+=1;log('Ngươi hoàn thành một việc ghi chép ngắn và nhận 3 bạc.');renderScene();updateUI()}return}
+ if(a==='network'){advance();S.influence+=1;log('Ngươi dành thời gian thăm hỏi và tạo một mối liên hệ ban đầu. Mối quan hệ này chưa đồng nghĩa với lòng tin sâu sắc.');renderScene();return}
+}
+function renderMap(){setMain(`<div class="eyebrow">Bản đồ sơ đồ</div><h2>Kinh thành và vùng lân cận</h2><p>Bản đồ này là sơ đồ gameplay, không phải bản đồ địa lý chính xác của năm 1856.</p><div class="choices">${[['Phố buôn','Nơi tìm việc và gặp Lẫm','Phố buôn'],['Khu trọ','Nơi nghỉ và xem lại hành trang','Chỗ trọ bình dân'],['Không gian học tập','Nơi tìm hiểu sách vở và người hướng dẫn','Không gian học tập'],['Nha môn','Chưa có quyền tiếp cận chính thức','Nha môn']].map((x,i)=>`<button class="choice" onclick="movePlace('${x[2]}',${i===3})"><strong>${x[0]}</strong><span>${x[1]}</span></button>`).join('')}</div><div class="notice">Các khu vực như hoàng thành, nha môn và không gian học thuật sẽ được mở theo điều kiện tiếp cận trong những phiên bản sau.</div>`)}
+function movePlace(place,locked){if(locked){alert('Ngươi chưa có tư cách hoặc người giới thiệu để tiếp cận nơi này.');return}S.place=place;advance();log('Di chuyển đến: '+place+'.');updateUI();renderScene()}
+function renderCase(){setMain(`<div class="eyebrow">Hồ sơ điều tra</div><h2>Mảnh giấy trong đêm mưa</h2><p><span class="tag">Trạng thái: ${S.questStage===0?'Chưa mở':S.questStage===1?'Đang điều tra':S.questStage===2?'Đang đánh giá':'Tạm khép lại'}</span></p><h3>Chứng cứ và thông tin</h3>${(S.clues.length?S.clues:['Sổ hàng ghi 12 bó vải thô.','Biên nhận ghi 10 bó vải thô.']).map(c=>`<div class="evidence">${esc(c)}</div>`).join('')}<h3>Giới hạn kết luận</h3><p>Chênh lệch giữa hai giấy tờ là điều đã quan sát được. Trộm cắp, gian lận hoặc cố ý sửa đổi vẫn là những giả thuyết chưa được chứng minh.</p><div class="foot-actions"><button onclick="setView('scene',document.querySelector('[data-view=scene]'))">Quay lại hiện tại</button></div>`)}
+function renderJournal(){setMain(`<div class="eyebrow">Nhật ký hành trình</div><h2>Những điều đã xảy ra</h2>${S.journal.map(x=>`<div class="evidence"><span class="small">Ngày ${x.day}</span><br>${esc(x.text)}</div>`).join('')}`)}
+const CHARACTER_DEFS=[
+ {key:'player',name:'Nhân vật chính',role:'Tú tài 25 tuổi · người chơi',slots:[['portrait','Chân dung / toàn thân']]},
+ {key:'doLam',name:'Đỗ Văn Lẫm',role:'Chủ hiệu buôn · NPC đang dùng',slots:[['portrait','Ảnh mặc định'],['idle','Đứng bình thường'],['talk','Đang nói'],['listen','Đang nghe']]},
+ {key:'carrier',name:'Người vận chuyển',role:'NPC của tuyến điều tra',slots:[['portrait','Chân dung']]},
+ {key:'scribe',name:'Người chép sổ',role:'NPC dự kiến · phố buôn',slots:[['portrait','Chân dung']]},
+ {key:'scholar',name:'Nho sinh đồng hương',role:'NPC dự kiến · mạng lưới sĩ tử',slots:[['portrait','Chân dung']]},
+ {key:'official',name:'Viên lại ở nha môn',role:'NPC dự kiến · công đường',slots:[['portrait','Chân dung']]},
+ {key:'soldier',name:'Lính canh',role:'NPC dự kiến · khu vực kiểm soát',slots:[['portrait','Chân dung']]}
+];
+function characterImage(key,slot='portrait'){
+ const exact=ART_CACHE[key+':'+slot];
+ const fallback=ART_CACHE[key+':portrait'];
+ if(exact||fallback)return exact||fallback;
+ const group=(S&&S.characterArt&&S.characterArt[key])||{};
+ return group[slot]||group.portrait||'';
+}
+function renderCharacters(){
+ currentView='characters';
+ const cards=CHARACTER_DEFS.map(c=>{
+  const preview=characterImage(c.key,c.key==='doLam'?'idle':'portrait');
+  const previewHtml=preview?`<img src="${preview}" alt="Tranh ${esc(c.name)}">`:`<div class="asset-missing"><div class="asset-seal">${c.key==='player'?'我':c.key==='doLam'?'林':'人'}</div><b>Chưa có hình minh họa</b><br><span>Tải ảnh ở phần bên dưới</span></div>`;
+  const slots=c.slots.map(([slot,label])=>`<label>${label}<input type="file" accept="image/png,image/webp,image/jpeg" onchange="uploadCharacterArt('${c.key}','${slot}',this)"></label>`).join('');
+  const count=Object.keys(ART_CACHE).filter(id=>id.startsWith(c.key+':')).length;
+  return `<article class="character-card"><h3>${esc(c.name)}</h3><div class="small">${esc(c.role)}</div><div class="character-preview">${previewHtml}</div><div class="art-slot">${slots}</div><div class="art-state">${count?`Đã gắn ${count} ảnh vào bản lưu trình duyệt.`:'Chưa có ảnh. Có thể dùng PNG nền trong suốt, WEBP hoặc JPG.'}</div><div class="foot-actions"><button class="secondary" onclick="clearCharacterArt('${c.key}')">Xóa ảnh nhân vật</button></div></article>`;
+ }).join('');
+ setMain(`<div class="eyebrow">Thư viện tài nguyên · Quản lý nhân vật</div><h2>Tranh nhân vật</h2><p>Tải hình do bạn tạo bằng công cụ bên ngoài vào đúng nhân vật. Ảnh sẽ được lưu trong bản lưu của trình duyệt này; không cần sửa HTML hoặc đổi tên file. Nhân vật chính có ô riêng, không bị dùng chung hình với NPC.</p><div class="notice"><b>Khuyến nghị:</b> PNG nền trong suốt, nhân vật đứng toàn thân, cùng tỷ lệ và bảng màu Đông Hồ. Với Đỗ Văn Lẫm, tải riêng ảnh đứng, đang nói và đang nghe để game đổi trạng thái theo hội thoại. Ảnh được thu nhỏ trước khi lưu để giảm dung lượng.</div><div class="foot-actions"><button onclick="exportAssetBackup()">Xuất sao lưu tài nguyên</button><label class="secondary" style="display:inline-block;padding:10px 14px;cursor:pointer">Khôi phục sao lưu<input type="file" accept="application/json,.json" style="display:none" onchange="importAssetBackup(this)"></label></div><div class="notice">Trước khi chuyển game sang website mới, hãy bấm “Xuất sao lưu tài nguyên” để tải về một tệp JSON chứa ảnh nhân vật và nhạc nền nếu có. Cất tệp này an toàn; dùng “Khôi phục sao lưu” để nhập lại trên bản game tương thích.</div><div class="character-gallery">${cards}</div><div class="notice">Ảnh và nhạc trong bản lưu trình duyệt không tự chuyển sang website mới. Hãy xuất sao lưu trước khi đổi phiên bản hoặc trình duyệt.</div>`);
+}
+async function uploadCharacterArt(key,slot,input){
+ const file=input&&input.files&&input.files[0];if(!file)return;
+ if(!/^image\/(png|webp|jpeg|jpg)$/i.test(file.type||'')){alert('Tệp này không được nhận dạng là ảnh. Hãy chọn PNG, JPG hoặc WEBP.');input.value='';return;}
+ const status=input.closest('label');
+ if(status)status.style.opacity='.6';
+ try{
+  const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Không đọc được tệp ảnh'));reader.readAsDataURL(file);});
+  const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Ảnh bị lỗi hoặc định dạng không được hỗ trợ'));im.src=data;});
+  const maxW=900,maxH=1200,scale=Math.min(1,maxW/img.width,maxH/img.height);
+  const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));
+  const ctx=canvas.getContext('2d');if(!ctx)throw new Error('Không thể xử lý ảnh trên trình duyệt này');
+  ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  let saved;try{saved=canvas.toDataURL('image/webp',0.86);if(!saved.startsWith('data:image/webp'))saved=canvas.toDataURL('image/png');}catch(e){saved=canvas.toDataURL('image/png');}
+  const id=key+':'+slot;
+  await saveArtToDB(id,saved);
+  ART_CACHE[id]=saved;
+  if(!S)S=defaults();attachArtCacheToState();
+  // Save game state without embedding large image data.
+  try{saveStateWithoutImages();}catch(e){console.warn('Không lưu được trạng thái game; ảnh vẫn đã lưu riêng.',e);}
+  renderCharacters();
+  alert('Đã tải ảnh thành công cho '+(CHARACTER_DEFS.find(x=>x.key===key)?.name||key)+'. Ảnh đã được lưu riêng và sẽ còn khi chơi lại.');
+ }catch(e){
+  console.error(e);
+  alert('Chưa tải được ảnh: '+(e&&e.message?e.message:'lỗi không xác định')+'. Hãy thử ảnh PNG/JPG/WEBP nhỏ hơn hoặc dùng Chrome/Edge mới.');
+ }finally{if(status)status.style.opacity='1';if(input)input.value='';}
+}
+async function clearCharacterArt(key){
+ try{await deleteArtFromDB(key+':');for(const id of Object.keys(ART_CACHE)){if(id.startsWith(key+':'))delete ART_CACHE[id];}if(S)attachArtCacheToState();try{saveStateWithoutImages();}catch(e){}renderCharacters();}
+ catch(e){alert('Không xóa được ảnh: '+(e.message||e));}
+}
+
+async function exportAssetBackup(){
+ try{
+  const db=await openArtDB();
+  const result=await new Promise((resolve,reject)=>{const tx=db.transaction(['art','audio'],'readonly');const ar=tx.objectStore('art').getAll();const au=tx.objectStore('audio').getAll();tx.oncomplete=()=>resolve({art:ar.result||[],audio:au.result||[]});tx.onerror=()=>reject(tx.error||new Error('Không đọc được kho tài nguyên'));});db.close();
+  const audio=[];for(const item of result.audio){if(item.blob){const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.readAsDataURL(item.blob);});audio.push({id:item.id,name:item.name||'music',data});}}
+  const payload={app:'dai-viet-hoang-trieu-assets',version:1,createdAt:new Date().toISOString(),art:result.art,audio};
+  const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='dai-viet-hoang-trieu-sao-luu-tai-nguyen.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
+  alert('Đã xuất sao lưu '+result.art.length+' ảnh và '+audio.length+' tệp nhạc. Hãy giữ tệp JSON này để khôi phục sau.');
+ }catch(e){console.error(e);alert('Không xuất được sao lưu: '+(e.message||e)+'. Hãy thử Chrome/Edge và mở lại game.');}
+}
+async function importAssetBackup(input){
+ const file=input.files&&input.files[0];if(!file)return;
+ try{
+  const payload=JSON.parse(await file.text());if(payload.app!=='dai-viet-hoang-trieu-assets'||!Array.isArray(payload.art)||!Array.isArray(payload.audio))throw new Error('Đây không phải tệp sao lưu tài nguyên hợp lệ.');
+  const db=await openArtDB();
+  await new Promise((resolve,reject)=>{const tx=db.transaction(['art','audio'],'readwrite');for(const item of payload.art){if(item&&item.id&&item.data)tx.objectStore('art').put(item);}tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('Không nhập được ảnh'));});db.close();
+  for(const item of payload.art){if(item&&item.id&&item.data)ART_CACHE[item.id]=item.data;}
+  const db2=await openArtDB();
+  for(const item of payload.audio){if(!item||!item.data)continue;const response=await fetch(item.data);const blob=await response.blob();await new Promise((resolve,reject)=>{const tx=db2.transaction('audio','readwrite');tx.objectStore('audio').put({id:item.id||MUSIC_DB_KEY,name:item.name||'Nhạc nền',blob});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error||new Error('Không nhập được nhạc'));});}
+  db2.close();if(S)attachArtCacheToState();renderCharacters();await loadSavedMusic();alert('Đã khôi phục '+payload.art.length+' ảnh và '+payload.audio.length+' tệp nhạc.');
+ }catch(e){console.error(e);alert('Không khôi phục được sao lưu: '+(e.message||e));}finally{input.value='';}
+}
+
+function renderProfile(){let bg={scholar:'Gia đình nhà nho sa sút',merchant:'Gia đình buôn bán nhỏ',farmer:'Gia đình nông dân có người từng đi học',clerk:'Gia đình có người làm việc giấy tờ'}[S.background];let art=characterImage('player');setMain(`<div class="eyebrow">Hồ sơ nhân vật</div><div class="npc-stage"><div class="npc-art">${art?`<img src="${art}" alt="Tranh nhân vật chính ${esc(S.name)}">`:`<div class="asset-missing"><div class="asset-seal">我</div><b>Chưa có tranh nhân vật chính</b><span>Vào mục Tranh nhân vật để tải ảnh của bạn vào game.</span></div>`}</div><div><h2>${esc(S.name)}</h2><div class="npc-role">Nhân vật chính · Tú tài</div><p>Tuổi 25 · Quê quán: ${esc(S.originText)}.</p><p>Gia cảnh: ${bg}. Động cơ chính: ${esc(S.motiveText)}.</p><p>Ngươi đến Huế để tìm kế sinh nhai, tiếp tục học tập và tự xây dựng vị thế của mình.</p><button onclick="setView('characters',document.querySelector('[data-view=characters]'))">Quản lý tranh nhân vật</button></div></div><div class="notice">Học vấn ${S.stats.study}/10 · Mưu lược ${S.stats.wit}/10 · Giao thiệp ${S.stats.social}/10</div>`)}
+function saveGame(){if(!S)return;try{saveStateWithoutImages();alert('Đã lưu trò chơi. Thư viện ảnh được lưu riêng.');}catch(e){alert('Không thể lưu trò chơi trên trình duyệt này.');}}
+function loadGame(){let raw=localStorage.getItem('dvh_save');if(!raw){alert('Chưa tìm thấy bản lưu trên trình duyệt này.');return}try{S=JSON.parse(raw);attachArtCacheToState();showScreen('game');updateUI();renderLog();renderScene('welcomeBack');alert('Đã tải bản lưu.');}catch(e){alert('Bản lưu không hợp lệ.');}}
+function renderCurrent(){if(currentView==='map')renderMap();else if(currentView==='case')renderCase();else if(currentView==='journal')renderJournal();else if(currentView==='profile')renderProfile();else if(currentView==='characters')renderCharacters();else renderScene()}
+window.addEventListener('DOMContentLoaded',()=>{loadArtFromDB();loadSavedMusic();$('musicFile').addEventListener('change',e=>storeMusic(e.target.files&&e.target.files[0]));setMusicVolume($('musicVolume').value);});
+</script>
+</body>
+</html>
