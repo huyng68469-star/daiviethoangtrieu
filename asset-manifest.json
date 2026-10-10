@@ -1,0 +1,21 @@
+{
+  "app": "dai-viet-hoang-trieu-assets",
+  "version": 1,
+  "characters": {
+    "carrier:portrait": "assets/characters/carrier_portrait.webp",
+    "doLam:portrait": "assets/characters/do_van_lam_portrait.webp",
+    "doLam:talk": "assets/characters/do_van_lam_talk.webp",
+    "official:portrait": "assets/characters/official_portrait.webp",
+    "player:portrait": "assets/characters/player_portrait.webp",
+    "scholar:portrait": "assets/characters/scholar_portrait.webp",
+    "scribe:portrait": "assets/characters/scribe_portrait.webp",
+    "soldier:portrait": "assets/characters/soldier_portrait.webp"
+  },
+  "audio": [
+    {
+      "id": "background_music",
+      "name": "nhac_game.mp3 (1).mp3",
+      "path": "assets/audio/background_music.mp3"
+    }
+  ]
+}
